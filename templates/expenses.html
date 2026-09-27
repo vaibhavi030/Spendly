@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses - Spendly{% endblock %}
+
+{% block content %}
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">💰</div>
+            <h1>Spendly</h1>
+            <p>Small Steps<br>Brighter Tomorrows</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-item"><span>⌂</span><span>Home</span></a>
+            <a href="{{ url_for('add_expense') }}" class="nav-item"><span>＋</span><span>Add Expense</span></a>
+            <a href="{{ url_for('expenses') }}" class="nav-item active"><span>▤</span><span>Expenses</span></a>
+            <a href="{{ url_for('analytics') }}" class="nav-item"><span>▥</span><span>Analytics</span></a>
+            <a href="{{ url_for('budget') }}" class="nav-item"><span>◎</span><span>Budget</span></a>
+            <a href="{{ url_for('profile') }}" class="nav-item"><span>♙</span><span>Profile</span></a>
+            <a href="{{ url_for('settings') }}" class="nav-item"><span>⚙</span><span>Settings</span></a>
+            <a href="{{ url_for('logout') }}" class="nav-item logout-link"><span>↪</span><span>Logout</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <form class="search-container" action="{{ url_for('expenses') }}" method="GET">
+                <span class="search-icon">⌕</span>
+                <input type="text" name="search" value="{{ search }}" placeholder="Search expenses, categories or anything...">
+            </form>
+
+            <div class="topbar-right">
+                <button class="theme-button" id="themeToggle" type="button">🌙</button>
+                <button class="notification-button" type="button">🔔</button>
+                <div class="profile-mini">
+                    <div class="profile-avatar">👩🏻</div>
+                    <div><strong>Hi, {{ current_user_name }}! 👋</strong><p>Keep going 💗</p></div>
+                </div>
+            </div>
+        </header>
+
+        <section class="page-section">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Your Expenses 💳</h2>
+                    <p>View, search, edit and delete your expenses.</p>
+                </div>
+                <a href="{{ url_for('add_expense') }}" class="primary-btn">＋ Add Expense</a>
+            </div>
+
+            <div class="stats-strip">
+                <div>
+                    <span>Total shown</span>
+                    <strong>{{ expenses|length }}</strong>
+                </div>
+                <div>
+                    <span>Amount shown</span>
+                    <strong>₹{{ "{:,.0f}".format(total) }}</strong>
+                </div>
+            </div>
+
+            <div class="table-card">
+
+                {% if expenses %}
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Expense</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for expense in expenses %}
+                                <tr>
+                                    <td>
+                                        <div class="table-expense">
+                                            <span class="table-icon">
+                                                {% if expense["category"] == "Food" %}🍕
+                                                {% elif expense["category"] == "Travel" %}🚌
+                                                {% elif expense["category"] == "Shopping" %}🛍️
+                                                {% elif expense["category"] == "Education" %}📚
+                                                {% elif expense["category"] == "Bills" %}💡
+                                                {% else %}💰{% endif %}
+                                            </span>
+                                            <strong>{{ expense["title"] }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>{{ expense["category"] }}</td>
+                                    <td>{{ expense["date"] }}</td>
+                                    <td class="amount-cell">₹{{ "{:,.0f}".format(expense["amount"]) }}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{{ url_for('edit_expense', expense_id=expense['id']) }}" class="small-btn">Edit</a>
+
+                                            <form method="POST" action="{{ url_for('delete_expense', expense_id=expense['id']) }}" onsubmit="return confirm('Delete this expense?');">
+                                                <button type="submit" class="small-btn danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state large">
+                        <div>🌱</div>
+                        <h3>No expenses found</h3>
+                        <p>Try another search or add your first expense.</p>
+                        <a href="{{ url_for('add_expense') }}" class="primary-btn">＋ Add Expense</a>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+    </main>
+</div>
+{% endblock %}

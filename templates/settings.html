@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Spendly{% endblock %}
+
+{% block content %}
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">💰</div>
+            <h1>Spendly</h1>
+            <p>Small Steps<br>Brighter Tomorrows</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-item"><span>⌂</span><span>Home</span></a>
+            <a href="{{ url_for('add_expense') }}" class="nav-item"><span>＋</span><span>Add Expense</span></a>
+            <a href="{{ url_for('expenses') }}" class="nav-item"><span>▤</span><span>Expenses</span></a>
+            <a href="{{ url_for('analytics') }}" class="nav-item"><span>▥</span><span>Analytics</span></a>
+            <a href="{{ url_for('budget') }}" class="nav-item"><span>◎</span><span>Budget</span></a>
+            <a href="{{ url_for('profile') }}" class="nav-item"><span>♙</span><span>Profile</span></a>
+            <a href="{{ url_for('settings') }}" class="nav-item active"><span>⚙</span><span>Settings</span></a>
+            <a href="{{ url_for('logout') }}" class="nav-item logout-link"><span>↪</span><span>Logout</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <form class="search-container" action="{{ url_for('expenses') }}" method="GET">
+                <span class="search-icon">⌕</span>
+                <input type="text" name="search" placeholder="Search expenses, categories or anything...">
+            </form>
+
+            <div class="topbar-right">
+                <button class="theme-button" id="themeToggle" type="button">🌙</button>
+                <button class="notification-button" type="button">🔔</button>
+                <div class="profile-mini">
+                    <div class="profile-avatar">👩🏻</div>
+                    <div><strong>Hi, {{ current_user_name }}! 👋</strong><p>Keep going 💗</p></div>
+                </div>
+            </div>
+        </header>
+
+        <section class="page-section">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Settings ⚙️</h2>
+                    <p>Customize how Spendly feels.</p>
+                </div>
+            </div>
+
+            <div class="settings-card">
+
+                <form method="POST">
+
+                    <div class="setting-row">
+                        <div>
+                            <strong>Theme</strong>
+                            <p>Choose the appearance of your dashboard.</p>
+                        </div>
+
+                        <select name="theme">
+                            <option value="light" {% if theme == "light" %}selected{% endif %}>Light</option>
+                            <option value="dark" {% if theme == "dark" %}selected{% endif %}>Dark</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="primary-btn">
+                        Save Settings
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+    </main>
+</div>
+{% endblock %}

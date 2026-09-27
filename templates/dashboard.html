@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Spendly{% endblock %}
+
+{% block content %}
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">💰</div>
+            <h1>Spendly</h1>
+            <p>Small Steps<br>Brighter Tomorrows</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-item active">
+                <span>⌂</span><span>Home</span>
+            </a>
+
+            <a href="{{ url_for('add_expense') }}" class="nav-item">
+                <span>＋</span><span>Add Expense</span>
+            </a>
+
+            <a href="{{ url_for('expenses') }}" class="nav-item">
+                <span>▤</span><span>Expenses</span>
+            </a>
+
+            <a href="{{ url_for('analytics') }}" class="nav-item">
+                <span>▥</span><span>Analytics</span>
+            </a>
+
+            <a href="{{ url_for('budget') }}" class="nav-item">
+                <span>◎</span><span>Budget</span>
+            </a>
+
+            <a href="{{ url_for('profile') }}" class="nav-item">
+                <span>♙</span><span>Profile</span>
+            </a>
+
+            <a href="{{ url_for('settings') }}" class="nav-item">
+                <span>⚙</span><span>Settings</span>
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="nav-item logout-link">
+                <span>↪</span><span>Logout</span>
+            </a>
+        </nav>
+
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <form class="search-container" action="{{ url_for('expenses') }}" method="GET">
+                <span class="search-icon">⌕</span>
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Search expenses, categories or anything..."
+                >
+            </form>
+
+            <div class="topbar-right">
+
+                <button class="theme-button" id="themeToggle" type="button">
+                    {% if session.get('theme') == 'dark' %}☀️{% else %}🌙{% endif %}
+                </button>
+
+                <button class="notification-button" type="button">
+                    🔔
+                </button>
+
+                <div class="profile-mini">
+                    <div class="profile-avatar">👩🏻</div>
+                    <div>
+                        <strong>Hi, {{ user["name"] }}! 👋</strong>
+                        <p>Keep going 💗</p>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <section class="dashboard">
+
+            <div class="greeting-section">
+                <div>
+                    <h2>Hey {{ user["name"] }}! 👋</h2>
+                    <p>Here's a quick look at your finances.</p>
+                </div>
+
+                <div class="quote-card">
+                    <span>"A better you<br>is a richer you."</span>
+                    <span class="quote-heart">♥</span>
+                </div>
+            </div>
+
+            <div class="summary-cards">
+
+                <div class="summary-card card-pink">
+                    <div class="card-icon">💳</div>
+                    <p>Total Spent</p>
+                    <h3>₹{{ "{:,.0f}".format(total_spent) }}</h3>
+                    <small>This month 💰</small>
+                </div>
+
+                <div class="summary-card card-green">
+                    <div class="card-icon">🎯</div>
+                    <p>Monthly Budget</p>
+                    <h3>₹{{ "{:,.0f}".format(monthly_budget) }}</h3>
+
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            style="width: {{ budget_percentage }}%;"
+                        ></div>
+                    </div>
+
+                    <small>{{ actual_budget_percentage }}% used</small>
+                </div>
+
+                <div class="summary-card card-yellow">
+                    <div class="card-icon">🪙</div>
+                    <p>Remaining</p>
+                    <h3>₹{{ "{:,.0f}".format(remaining) }}</h3>
+
+                    {% if remaining >= 0 %}
+                        <small>✨ You're doing great!</small>
+                    {% else %}
+                        <small>⚠️ Budget exceeded</small>
+                    {% endif %}
+                </div>
+
+                <div class="summary-card card-purple">
+                    <div class="card-icon">📅</div>
+                    <p>Today's Spent</p>
+                    <h3>₹{{ "{:,.0f}".format(today_spent) }}</h3>
+                    <small>
+                        ≡ {{ today_transactions }}
+                        transaction{% if today_transactions != 1 %}s{% endif %}
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="middle-grid">
+
+                <div class="dashboard-card spending-card">
+                    <div class="card-heading">
+                        <h3>Spending Breakdown</h3>
+                        <span class="dropdown">This Month</span>
+                    </div>
+
+                    <div class="spending-content">
+
+                        <div
+                            class="donut-chart"
+                            style="background: {{ donut_gradient }};"
+                        >
+                            <div class="donut-center">
+                                <strong>₹{{ "{:,.0f}".format(total_spent) }}</strong>
+                                <span>Total</span>
+                            </div>
+                        </div>
+
+                        <div class="category-list">
+
+                            {% if categories %}
+                                {% for category in categories %}
+                                    <div>
+                                        <span
+                                            class="category-dot"
+                                            style="background: {{ category.color }};"
+                                        ></span>
+                                        <span>{{ category.name }}</span>
+                                        <strong>{{ category.percentage }}%</strong>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="empty-text">No spending this month yet 🌱</p>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="dashboard-card weekly-card">
+
+                    <div class="card-heading">
+                        <h3>Expenses This Week</h3>
+                        <span class="dropdown">This Week</span>
+                    </div>
+
+                    <div class="bar-chart">
+
+                        {% for day in weekly_data %}
+
+                            <div class="bar-column">
+
+                                {% if max_weekly_amount > 0 %}
+                                    <div
+                                        class="bar"
+                                        style="height: {{ ((day.amount / max_weekly_amount) * 155)|round }}px;"
+                                        title="₹{{ "{:,.0f}".format(day.amount) }}"
+                                    ></div>
+                                {% else %}
+                                    <div class="bar" style="height: 5px;"></div>
+                                {% endif %}
+
+                                <span>{{ day.day }}</span>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card quick-card">
+
+                    <h3>Quick Actions</h3>
+
+                    <button class="quick-primary" onclick="location.href='{{ url_for('add_expense') }}'">
+                        ＋ Add Expense
+                    </button>
+
+                    <button onclick="location.href='{{ url_for('expenses') }}'">
+                        ▤ View Expenses
+                    </button>
+
+                    <button onclick="location.href='{{ url_for('budget') }}'">
+                        ◎ Set / Edit Budget
+                    </button>
+
+                    <button onclick="location.href='{{ url_for('analytics') }}'">
+                        ▥ View Analytics
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="bottom-grid">
+
+                <div class="dashboard-card recent-card">
+
+                    <div class="card-heading">
+                        <h3>Recent Expenses</h3>
+                        <a href="{{ url_for('expenses') }}">View All →</a>
+                    </div>
+
+                    <div class="expense-list">
+
+                        {% if expenses %}
+
+                            {% for expense in expenses[:5] %}
+
+                                <div class="expense-item">
+
+                                    <div class="expense-icon">
+                                        {% if expense["category"] == "Food" %}
+                                            🍕
+                                        {% elif expense["category"] == "Travel" %}
+                                            🚌
+                                        {% elif expense["category"] == "Shopping" %}
+                                            🛍️
+                                        {% elif expense["category"] == "Education" %}
+                                            📚
+                                        {% elif expense["category"] == "Bills" %}
+                                            💡
+                                        {% else %}
+                                            💰
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="expense-info">
+                                        <strong>{{ expense["title"] }}</strong>
+                                        <span>{{ expense["category"] }} • {{ expense["date"] }}</span>
+                                    </div>
+
+                                    <strong>- ₹{{ "{:,.0f}".format(expense["amount"]) }}</strong>
+
+                                </div>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <div class="empty-state">
+                                <div>🌱</div>
+                                <p>No expenses added yet.</p>
+                                <a href="{{ url_for('add_expense') }}">Add your first expense</a>
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <div class="fun-card">
+                    <div class="plant">🪴</div>
+                    <h3>Spend wisely<br>today for a<br>brighter tomorrow ✨</h3>
+                    <p>Keep growing your money habits!</p>
+                </div>
+
+                <div class="money-column">
+
+                    <div class="dashboard-card money-mood">
+
+                        <div class="card-heading">
+                            <h3>Money Mood</h3>
+                            <span class="dropdown">This Month</span>
+                        </div>
+
+                        <div class="mood-content">
+
+                            <div class="mood-face">
+                                {% if actual_budget_percentage < 70 %}
+                                    😊
+                                {% elif actual_budget_percentage < 90 %}
+                                    🙂
+                                {% elif actual_budget_percentage < 100 %}
+                                    😬
+                                {% else %}
+                                    😮‍💨
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <strong>
+                                    {% if actual_budget_percentage < 70 %}
+                                        You're on track!
+                                    {% elif actual_budget_percentage < 90 %}
+                                        Keep an eye on spending.
+                                    {% elif actual_budget_percentage < 100 %}
+                                        Almost at your limit!
+                                    {% else %}
+                                        Time to slow down!
+                                    {% endif %}
+                                </strong>
+
+                                <p>
+                                    {{ actual_budget_percentage }}% of your
+                                    monthly budget is used.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mini-quote">
+                        “It's not just about money,<br>
+                        it's about the life<br>
+                        you want to create.”
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Spendly{% endblock %}
+
+{% block content %}
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">💰</div>
+            <h1>Spendly</h1>
+            <p>Small Steps<br>Brighter Tomorrows</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-item"><span>⌂</span><span>Home</span></a>
+            <a href="{{ url_for('add_expense') }}" class="nav-item"><span>＋</span><span>Add Expense</span></a>
+            <a href="{{ url_for('expenses') }}" class="nav-item"><span>▤</span><span>Expenses</span></a>
+            <a href="{{ url_for('analytics') }}" class="nav-item active"><span>▥</span><span>Analytics</span></a>
+            <a href="{{ url_for('budget') }}" class="nav-item"><span>◎</span><span>Budget</span></a>
+            <a href="{{ url_for('profile') }}" class="nav-item"><span>♙</span><span>Profile</span></a>
+            <a href="{{ url_for('settings') }}" class="nav-item"><span>⚙</span><span>Settings</span></a>
+            <a href="{{ url_for('logout') }}" class="nav-item logout-link"><span>↪</span><span>Logout</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <form class="search-container" action="{{ url_for('expenses') }}" method="GET">
+                <span class="search-icon">⌕</span>
+                <input type="text" name="search" placeholder="Search expenses, categories or anything...">
+            </form>
+
+            <div class="topbar-right">
+                <button class="theme-button" id="themeToggle" type="button">🌙</button>
+                <button class="notification-button" type="button">🔔</button>
+                <div class="profile-mini">
+                    <div class="profile-avatar">👩🏻</div>
+                    <div><strong>Hi, {{ current_user_name }}! 👋</strong><p>Keep going 💗</p></div>
+                </div>
+            </div>
+        </header>
+
+        <section class="page-section">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Analytics 📊</h2>
+                    <p>Understand where your money went in {{ month_name }}.</p>
+                </div>
+            </div>
+
+            <div class="analytics-summary">
+                <div class="analytics-total">
+                    <span>Total spent this month</span>
+                    <strong>₹{{ "{:,.0f}".format(total_spent) }}</strong>
+                </div>
+            </div>
+
+            <div class="analytics-grid">
+
+                <div class="dashboard-card">
+                    <div class="card-heading">
+                        <h3>Category Breakdown</h3>
+                    </div>
+
+                    {% if categories %}
+                        <div class="analytics-list">
+                            {% for category in categories %}
+                                <div class="analytics-row">
+                                    <div>
+                                        <strong>{{ category.name }}</strong>
+                                        <span>{{ category.percentage }}%</span>
+                                    </div>
+                                    <strong>₹{{ "{:,.0f}".format(category.amount) }}</strong>
+                                </div>
+                                <div class="analytics-progress">
+                                    <div style="width: {{ category.percentage }}%;"></div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div>📊</div>
+                            <p>No analytics available yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-heading">
+                        <h3>Daily Spending</h3>
+                    </div>
+
+                    {% if daily_data %}
+                        <div class="daily-list">
+                            {% for row in daily_data %}
+                                <div>
+                                    <span>{{ row["date"] }}</span>
+                                    <strong>₹{{ "{:,.0f}".format(row["total"]) }}</strong>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div>🌱</div>
+                            <p>Add expenses to see your daily pattern.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+</div>
+{% endblock %}
