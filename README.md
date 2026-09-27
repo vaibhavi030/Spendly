@@ -1,44 +1,40 @@
 # Spendly
 
-Spendly is a Flask + SQLite personal finance tracker.
+A personal finance management web application for tracking expenses, managing budgets, and understanding spending patterns.
 
-## Features
+Spendly provides a simple and intuitive platform where users can record daily expenses, set monthly budgets, and monitor their financial activity through a centralized dashboard.
 
-- Login and signup
-- Password hashing
-- Dashboard with monthly spending
-- Add, edit and delete expenses
-- Expense search
-- Monthly budget
-- Analytics
-- Profile
-- Settings
-- Light/dark theme
-- Responsive UI
+## Key Features
 
-## Run locally
+- Expense Management — Add, edit, delete, and search transactions
+- Budget Management — Set and monitor monthly spending limits
+- Financial Dashboard — View total spending, remaining budget, and recent transactions
+- Spending Analytics — Analyze expenses by category and across different time periods
+- User Authentication — Registration, login, and session management
+- Profile and Settings — Manage user information and application preferences
+- Responsive Interface — Designed for desktop and smaller screens
+- Light and Dark Mode — Switch between visual themes
 
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
-```
+## Technology Stack
 
-Open:
+| Layer | Technologies |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript |
+| Backend | Python, Flask |
+| Database | SQLite |
+| Authentication | Flask Sessions, Werkzeug |
+| Version Control | Git, GitHub |
 
-http://127.0.0.1:5000
+## Project Structure
 
-## Demo account
-
-Email:
-`vaibhavi@example.com`
-
-Password:
-`password`
-
-You can also create a new account using Signup.
-
-## GitHub
-
-Do not commit `venv/`, `.env`, or `spendly.db`.
+```text
+Spendly/
+├── app.py
+├── database.py
+├── templates/
+├── static/
+│   ├── css/
+│   └── js/
+├── requirements.txt
+├── .gitignore
+└── README.md
